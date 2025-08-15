@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simpleviewergallery maxImageWidth="640" maxImageHeight="480" textColor="0xFFFFFF" frameColor="0x333333" frameWidth="10" stagePadding="40" navPadding="40" thumbnailColumns="3" thumbnailRows="3" navPosition="left" vAlign="center" hAlign="center" title="2008.10.24 Orosháza - Anno" enableRightClickOpen="true" backgroundImagePath="" imagePath="" thumbPath="">
+<image>
+	<filename>dsc01490.jpg</filename>
+	<caption></caption>	
+</image>
+<image>
+	<filename>dsc01509.jpg</filename>
+	<caption></caption>	
+</image>
+<image>
+	<filename>dsc01514.jpg</filename>
+	<caption></caption>	
+</image>
+<image>
+	<filename>dsc01516.jpg</filename>
+	<caption></caption>	
+</image>
+<image>
+	<filename>dsc01519.jpg</filename>
+	<caption></caption>	
+</image>
+<image>
+	<filename>dsc01532.jpg</filename>
+	<caption></caption>	
+</image>
+<image>
+	<filename>dsc01537.jpg</filename>
+	<caption></caption>	
+</image>
+<image>
+	<filename>dsc01541.jpg</filename>
+	<caption></caption>	
+</image>
+
+</simpleviewergallery>

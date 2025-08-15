@@ -1,0 +1,16 @@
+<player>
+  <playlist>
+    <track>
+      <file>http://high-voltage.hu/mp3/You_shook_me_all_night_long.mp3</file>
+      <title>You shook me all night long.mp</title>
+      <artist></artist>
+      <album></album>
+    </track>
+    <track>
+      <file>http://high-voltage.hu/mp3/Back_in_black.mp3</file>
+      <title>Back in black.mp3</title>
+      <artist></artist>
+      <album></album>
+    </track>
+  </playlist>
+</player>
