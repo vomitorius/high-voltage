@@ -30,7 +30,7 @@ vercel
 ```
 
 ### Option 3: Manual Upload
-1. Zip the contents of the `web/` folder
+1. Zip all website files from the root directory (excluding .git, README.md, etc.)
 2. Upload to any static hosting service (Netlify, GitHub Pages, etc.)
 
 ## Website Structure

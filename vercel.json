@@ -3,18 +3,8 @@
   "name": "high-voltage-band",
   "builds": [
     {
-      "src": "web/**",
+      "src": "**",
       "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/web/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/web/index.html"
     }
   ],
   "cleanUrls": true,
