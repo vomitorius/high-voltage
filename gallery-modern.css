@@ -346,15 +346,10 @@ body {
     }
 }
 
-/* Loading Animation */
-.gallery-item img[loading="lazy"] {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.gallery-item img[loading="lazy"].loaded,
-.gallery-item img[loading="lazy"]:not([loading]) {
+/* Loading Animation - Remove lazy loading opacity issue */
+.gallery-item img {
     opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
 /* Focus styles for accessibility */

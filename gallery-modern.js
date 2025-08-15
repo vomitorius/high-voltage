@@ -67,7 +67,7 @@ class ModernGallery {
             <div class="modern-gallery">
                 <header class="gallery-header">
                     <h1>${this.title}</h1>
-                    <a href="../03.html" class="back-btn">← Vissza a képekhez</a>
+                    <a href="../03.html" class="back-btn">← Vissza a galériákhoz</a>
                 </header>
                 
                 <div class="gallery-grid" id="gallery-grid">
@@ -196,7 +196,7 @@ class ModernGallery {
             <div class="gallery-error">
                 <h2>Hiba</h2>
                 <p>${message}</p>
-                <a href="../03.html">← Vissza a képekhez</a>
+                <a href="../03.html">← Vissza a galériákhoz</a>
             </div>
         `;
     }
