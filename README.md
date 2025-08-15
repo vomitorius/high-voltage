@@ -60,8 +60,6 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 - All Pages: Consistent modern design with the band's rock aesthetic
 
 ## 🎸 Contact Information
-- **Email**: dctribute@gmail.com, barna.szilard@freemail.hu  
-- **Phone**: Kacsa: +36306176788, Szilárd: +36303361990
 - **Location**: Hódmezővásárhely, Hungary
 - **Original Developer**: Kacsa
 - **Modernization**: 2024
