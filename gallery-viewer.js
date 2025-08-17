@@ -26,7 +26,8 @@ class GalleryViewer {
     
     async loadGalleryData() {
         try {
-            const response = await fetch('./gallery.xml');
+            const galleryPath = this.getGalleryBasePath();
+            const response = await fetch(`${galleryPath}gallery.xml`);
             if (!response.ok) {
                 throw new Error('Nem található gallery.xml fájl');
             }
@@ -65,8 +66,8 @@ class GalleryViewer {
                 return {
                     filename: filename,
                     caption: caption,
-                    thumbSrc: `./thumbs/${filename}`,
-                    fullSrc: `./images/${filename}`
+                    thumbSrc: `${galleryPath}thumbs/${filename}`,
+                    fullSrc: `${galleryPath}images/${filename}`
                 };
             }).filter(img => img !== null);
             
@@ -83,6 +84,20 @@ class GalleryViewer {
         const path = window.location.pathname;
         const pathParts = path.split('/').filter(part => part.length > 0);
         return pathParts[pathParts.length - 1] || 'Galéria';
+    }
+    
+    getGalleryBasePath() {
+        // Get the current directory path for the gallery
+        const path = window.location.pathname;
+        const pathParts = path.split('/').filter(part => part.length > 0);
+        
+        // Remove the index.html if present and get the directory path
+        if (pathParts.length > 0 && pathParts[pathParts.length - 1].includes('.html')) {
+            pathParts.pop();
+        }
+        
+        // Construct the base path for this gallery
+        return pathParts.length > 0 ? `/${pathParts.join('/')}/` : '/';
     }
     
     createGalleryHTML() {
