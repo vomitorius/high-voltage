@@ -1,15 +1,15 @@
 /**
- * Modern Gallery System for High Voltage Website
- * Replaces Flash-based SimpleViewer galleries
+ * Simple Gallery Viewer for High Voltage Website
+ * Reads gallery.xml and displays images from images/ and thumbs/ folders
+ * Clean, simple implementation without complex fallback patterns
+ * 
+ * Note: Uses full-size images for thumbnails to improve quality,
+ * falls back to thumbnail images if full-size fails to load
  */
 
-class ModernGallery {
-    constructor(options = {}) {
-        this.xmlPath = options.xmlPath || 'gallery.xml';
-        this.imagePath = options.imagePath || 'images/';
-        this.thumbPath = options.thumbPath || 'thumbs/';
-        this.title = options.title || '';
-        this.container = null;
+class GalleryViewer {
+    constructor() {
+        this.title = '';
         this.images = [];
         this.currentIndex = 0;
         
@@ -23,58 +23,108 @@ class ModernGallery {
             this.bindEvents();
         } catch (error) {
             console.error('Failed to initialize gallery:', error);
-            this.showError('Hiba a galéria betöltése közben.');
+            this.showError('Hiba a galéria betöltése közben: ' + error.message);
         }
     }
     
     async loadGalleryData() {
         try {
-            const response = await fetch(this.xmlPath);
+            const galleryPath = this.getGalleryBasePath();
+            const response = await fetch(`${galleryPath}gallery.xml`);
+            if (!response.ok) {
+                throw new Error('Nem található gallery.xml fájl');
+            }
+            
             const xmlText = await response.text();
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
             
+            // Check for XML parsing errors
+            const parserError = xmlDoc.querySelector('parsererror');
+            if (parserError) {
+                throw new Error('Hiba a gallery.xml feldolgozásában');
+            }
+            
             // Parse gallery attributes
             const galleryElement = xmlDoc.querySelector('simpleviewergallery');
-            if (galleryElement) {
-                this.title = galleryElement.getAttribute('title') || this.title;
-                this.imagePath = galleryElement.getAttribute('imagePath') || this.imagePath;
-                this.thumbPath = galleryElement.getAttribute('thumbPath') || this.thumbPath;
+            if (!galleryElement) {
+                throw new Error('Érvénytelen gallery.xml formátum');
             }
+            
+            this.title = galleryElement.getAttribute('title') || this.getFolderName();
             
             // Parse images
             const imageElements = xmlDoc.querySelectorAll('image');
             this.images = Array.from(imageElements).map(img => {
-                const filename = img.querySelector('filename').textContent;
-                const caption = img.querySelector('caption').textContent || '';
+                const filenameElement = img.querySelector('filename');
+                const captionElement = img.querySelector('caption');
                 
+                if (!filenameElement) {
+                    return null;
+                }
+                
+                const filename = filenameElement.textContent.trim();
+                const caption = captionElement ? captionElement.textContent.trim() : '';
+                
+                const galleryPath = this.getGalleryBasePath();
                 return {
                     filename: filename,
                     caption: caption,
-                    thumbSrc: this.thumbPath + filename,
-                    fullSrc: this.imagePath + filename
+                    thumbSrc: `${galleryPath}images/${filename}`, // Use full-size image for better quality
+                    thumbFallback: `${galleryPath}thumbs/${filename}`, // Fallback to thumbnail if full image fails
+                    fullSrc: `${galleryPath}images/${filename}`
                 };
-            });
+            }).filter(img => img !== null);
+            
+            if (this.images.length === 0) {
+                throw new Error('Nincsenek képek a gallery.xml fájlban');
+            }
             
         } catch (error) {
-            throw new Error('Nem sikerült betölteni a gallery.xml fájlt: ' + error.message);
+            throw new Error('Nem sikerült betölteni a galéria adatokat: ' + error.message);
         }
+    }
+    
+    getFolderName() {
+        const path = window.location.pathname;
+        const pathParts = path.split('/').filter(part => part.length > 0);
+        return pathParts[pathParts.length - 1] || 'Galéria';
+    }
+    
+    getGalleryBasePath() {
+        // Get the current directory path for the gallery
+        const path = window.location.pathname;
+        const pathParts = path.split('/').filter(part => part.length > 0);
+        
+        // Remove the index.html if present and get the directory path
+        if (pathParts.length > 0 && pathParts[pathParts.length - 1].includes('.html')) {
+            pathParts.pop();
+        }
+        
+        // Construct the base path for this gallery
+        return pathParts.length > 0 ? `/${pathParts.join('/')}/` : '/';
     }
     
     createGalleryHTML() {
         const body = document.body;
         body.innerHTML = `
-            <div class="modern-gallery">
+            <div class="gallery-viewer">
                 <header class="gallery-header">
                     <h1>${this.title}</h1>
                     <a href="../03.html" class="back-btn">← Vissza a galériákhoz</a>
                 </header>
                 
+                <div class="gallery-info">
+                    <p>${this.images.length} kép található ebben a galériában</p>
+                </div>
+                
                 <div class="gallery-grid" id="gallery-grid">
                     ${this.images.map((img, index) => `
                         <div class="gallery-item" data-index="${index}">
-                            <img src="${img.thumbSrc}" alt="${img.caption}" loading="lazy" 
-                                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE1MCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmaWxsPSIjY2NjIiBmb250LXNpemU9IjE0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+S2VwIG5lbSB0YWxhbGhhdMOzPC90ZXh0Pjwvc3ZnPg=='">
+                            <img src="${img.thumbSrc}" 
+                                 alt="${img.caption || `Kép ${index + 1}`}" 
+                                 loading="lazy" 
+                                 onerror="this.src='${img.thumbFallback}'; this.parentElement.classList.add('fallback')">
                             ${img.caption ? `<div class="caption">${img.caption}</div>` : ''}
                         </div>
                     `).join('')}
@@ -96,7 +146,7 @@ class ModernGallery {
             </div>
         `;
         
-        this.container = document.querySelector('.modern-gallery');
+        this.container = document.querySelector('.gallery-viewer');
         this.modal = document.getElementById('gallery-modal');
         this.modalImage = document.getElementById('modal-image');
         this.modalCaption = document.getElementById('modal-caption');
@@ -107,13 +157,21 @@ class ModernGallery {
         // Thumbnail clicks
         const thumbnails = document.querySelectorAll('.gallery-item');
         thumbnails.forEach((thumb, index) => {
-            thumb.addEventListener('click', () => this.openModal(index));
+            thumb.addEventListener('click', () => {
+                if (!thumb.classList.contains('error')) {
+                    this.openModal(index);
+                }
+            });
         });
         
         // Modal events
-        document.querySelector('.modal-close').addEventListener('click', () => this.closeModal());
-        document.querySelector('.modal-prev').addEventListener('click', () => this.prevImage());
-        document.querySelector('.modal-next').addEventListener('click', () => this.nextImage());
+        const closeBtn = document.querySelector('.modal-close');
+        const prevBtn = document.querySelector('.modal-prev');
+        const nextBtn = document.querySelector('.modal-next');
+        
+        if (closeBtn) closeBtn.addEventListener('click', () => this.closeModal());
+        if (prevBtn) prevBtn.addEventListener('click', () => this.prevImage());
+        if (nextBtn) nextBtn.addEventListener('click', () => this.nextImage());
         
         // Modal background click
         this.modal.addEventListener('click', (e) => {
@@ -164,15 +222,17 @@ class ModernGallery {
         const img = this.images[index];
         
         this.modalImage.src = img.fullSrc;
-        this.modalCaption.textContent = img.caption;
+        this.modalCaption.textContent = img.caption || `Kép ${index + 1}`;
         this.modalCounter.textContent = `${index + 1} / ${this.images.length}`;
         
         this.modal.classList.add('active');
         document.body.style.overflow = 'hidden';
         
-        // Handle image load error
+        // Handle image load error - fallback to thumbnail
         this.modalImage.onerror = () => {
-            this.modalImage.src = img.thumbSrc;
+            if (this.modalImage.src !== img.thumbSrc) {
+                this.modalImage.src = img.thumbSrc;
+            }
         };
     }
     
@@ -196,6 +256,7 @@ class ModernGallery {
             <div class="gallery-error">
                 <h2>Hiba</h2>
                 <p>${message}</p>
+                <p>Mappa: ${this.getFolderName()}</p>
                 <a href="../03.html">← Vissza a galériákhoz</a>
             </div>
         `;
@@ -204,5 +265,5 @@ class ModernGallery {
 
 // Initialize gallery when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new ModernGallery();
+    new GalleryViewer();
 });
