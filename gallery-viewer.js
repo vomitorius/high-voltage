@@ -67,12 +67,14 @@ class GalleryViewer {
                 const caption = captionElement ? captionElement.textContent.trim() : '';
                 
                 const galleryPath = this.getGalleryBasePath();
+                // URL-encode the filename to match the actual files on the filesystem
+                const encodedFilename = encodeURIComponent(filename);
                 return {
                     filename: filename,
                     caption: caption,
-                    thumbSrc: `${galleryPath}images/${filename}`, // Use full-size image for better quality
-                    thumbFallback: `${galleryPath}thumbs/${filename}`, // Fallback to thumbnail if full image fails
-                    fullSrc: `${galleryPath}images/${filename}`
+                    thumbSrc: `${galleryPath}images/${encodedFilename}`, // Use full-size image for better quality
+                    thumbFallback: `${galleryPath}thumbs/${encodedFilename}`, // Fallback to thumbnail if full image fails
+                    fullSrc: `${galleryPath}images/${encodedFilename}`
                 };
             }).filter(img => img !== null);
             
