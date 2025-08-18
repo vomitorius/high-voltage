@@ -67,8 +67,9 @@ class GalleryViewer {
                 const caption = captionElement ? captionElement.textContent.trim() : '';
                 
                 const galleryPath = this.getGalleryBasePath();
-                // URL-encode the filename to match the actual files on the filesystem
-                const encodedFilename = encodeURIComponent(filename);
+                // Convert filename to match filesystem encoding (Latin-1 URL encoding for accents, spaces encoded)
+                // The filesystem files have accents encoded as Latin-1 (%E9 for 'é') and spaces need to be %20
+                const encodedFilename = filename.replace(/é/g, '%E9').replace(/ /g, '%20');
                 return {
                     filename: filename,
                     caption: caption,
