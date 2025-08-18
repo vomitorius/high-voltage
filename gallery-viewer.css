@@ -70,7 +70,7 @@ body {
 /* Gallery Grid */
 .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
     padding: 20px 0;
 }
@@ -98,6 +98,11 @@ body {
     cursor: not-allowed;
 }
 
+.gallery-item.fallback {
+    background: rgba(100, 100, 0, 0.2);
+    border-color: rgba(220, 20, 60, 0.4);
+}
+
 .gallery-item.error:hover {
     transform: none;
     box-shadow: none;
@@ -109,6 +114,9 @@ body {
     object-fit: cover;
     display: block;
     transition: all 0.3s ease;
+    max-width: 100%;
+    image-rendering: auto;
+    image-rendering: -webkit-optimize-contrast;
 }
 
 .gallery-item:hover img {

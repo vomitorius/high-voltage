@@ -2,6 +2,9 @@
  * Simple Gallery Viewer for High Voltage Website
  * Reads gallery.xml and displays images from images/ and thumbs/ folders
  * Clean, simple implementation without complex fallback patterns
+ * 
+ * Note: Uses full-size images for thumbnails to improve quality,
+ * falls back to thumbnail images if full-size fails to load
  */
 
 class GalleryViewer {
@@ -63,10 +66,12 @@ class GalleryViewer {
                 const filename = filenameElement.textContent.trim();
                 const caption = captionElement ? captionElement.textContent.trim() : '';
                 
+                const galleryPath = this.getGalleryBasePath();
                 return {
                     filename: filename,
                     caption: caption,
-                    thumbSrc: `${galleryPath}thumbs/${filename}`,
+                    thumbSrc: `${galleryPath}images/${filename}`, // Use full-size image for better quality
+                    thumbFallback: `${galleryPath}thumbs/${filename}`, // Fallback to thumbnail if full image fails
                     fullSrc: `${galleryPath}images/${filename}`
                 };
             }).filter(img => img !== null);
@@ -119,7 +124,7 @@ class GalleryViewer {
                             <img src="${img.thumbSrc}" 
                                  alt="${img.caption || `Kép ${index + 1}`}" 
                                  loading="lazy" 
-                                 onerror="this.parentElement.classList.add('error')">
+                                 onerror="this.src='${img.thumbFallback}'; this.parentElement.classList.add('fallback')">
                             ${img.caption ? `<div class="caption">${img.caption}</div>` : ''}
                         </div>
                     `).join('')}
