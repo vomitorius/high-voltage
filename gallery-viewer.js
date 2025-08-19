@@ -67,12 +67,17 @@ class GalleryViewer {
                 const caption = captionElement ? captionElement.textContent.trim() : '';
                 
                 const galleryPath = this.getGalleryBasePath();
+                // Convert filename to match filesystem encoding and URL-encode for HTTP requests
+                // The filesystem files have accents encoded as Latin-1 (%E9 for 'é') as literal chars
+                // These need to be properly URL encoded for HTTP requests
+                const filesystemFilename = filename.replace(/é/g, '%E9');
+                const encodedFilename = encodeURIComponent(filesystemFilename);
                 return {
                     filename: filename,
                     caption: caption,
-                    thumbSrc: `${galleryPath}images/${filename}`, // Use full-size image for better quality
-                    thumbFallback: `${galleryPath}thumbs/${filename}`, // Fallback to thumbnail if full image fails
-                    fullSrc: `${galleryPath}images/${filename}`
+                    thumbSrc: `${galleryPath}images/${encodedFilename}`, // Use full-size image for better quality
+                    thumbFallback: `${galleryPath}thumbs/${encodedFilename}`, // Fallback to thumbnail if full image fails
+                    fullSrc: `${galleryPath}images/${encodedFilename}`
                 };
             }).filter(img => img !== null);
             
